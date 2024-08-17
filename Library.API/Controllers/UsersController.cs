@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Library.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/users")]
+    [Produces("application/json")]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;

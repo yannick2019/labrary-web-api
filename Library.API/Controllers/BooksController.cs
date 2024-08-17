@@ -23,8 +23,8 @@ namespace Library.API.Controllers
         /// Gets all books.
         /// </summary>
         /// <returns>A list of all books.</returns>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+        [HttpGet(Name = "GetAllBooks")]
+        public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks()
         {
             var books = await _bookService.GetAllBooksAsync();
             return Ok(books);
@@ -35,7 +35,7 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="bookParameters">The parameters for pagination and filtering of books.</param>
         /// <returns>A paginated list of books.</returns>
-        [HttpGet(Name = "GetBooks")]
+        [HttpGet("paginated-list", Name = "GetBooks")]
         public async Task<ActionResult<PaginatedList<Book>>> GetBooks([FromQuery] BookParameters bookParameters)
         {
             var books = await _bookService.GetPaginatedBooksAsync(bookParameters);

@@ -21,8 +21,8 @@ namespace Library.API.Controllers
         /// Gets all users.
         /// </summary>
         /// <returns>A list of all users.</returns>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [HttpGet(Name = "GetAllUsers")]
+        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
@@ -33,7 +33,7 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="userParameters">The parameters for pagination and filtering of users.</param>
         /// <returns>A paginated list of users.</returns>
-        [HttpGet(Name = "GetUsers")]
+        [HttpGet("paginated-list", Name = "GetUsers")]
         public async Task<ActionResult<PaginatedList<User>>> GetUsers([FromQuery] UserParameters userParameters)
         {
             var users = await _userService.GetPaginatedUsersAsync(userParameters);

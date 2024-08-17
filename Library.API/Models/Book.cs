@@ -24,6 +24,6 @@ namespace Library.API.Models
         public int PublicationYear { get; set; }
 
         public int? BorrowerId { get; set; }
-        public User Borrower { get; set; } = null!;
+        public User? Borrower { get; set; }
     }
 }

@@ -143,6 +143,35 @@ namespace Library.API.Controllers
         }
 
         /// <summary>
+        /// Returns a borrowed book by ID.
+        /// </summary>
+        /// <param name="id">The ID of the book to return.</param>
+        /// <returns>BookReturnResponse if the return was successful.</returns>
+        [HttpPost("{id}/return")]
+        public async Task<ActionResult<BookReturnResponse>> ReturnBook(int id)
+        {
+            try
+            {
+                var book = await _bookService.ReturnBookAsync(id);
+                var response = new BookReturnResponse
+                {
+                    BookId = book.Id,
+                    Title = book.Title,
+                    IsReturned = true
+                };
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Deletes a specific book.
         /// </summary>
         /// <param name="id"></param>

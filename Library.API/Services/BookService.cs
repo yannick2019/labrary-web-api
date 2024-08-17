@@ -81,6 +81,27 @@ namespace Library.API.Services
             return book;
         }
 
+        public async Task<Book> ReturnBookAsync(int bookId)
+        {
+            var book = await _context.Books.FindAsync(bookId);
+            if (book == null)
+            {
+                throw new KeyNotFoundException($"Book with ID {bookId} not found.");
+            }
+
+            if (!book.BorrowerId.HasValue)
+            {
+                throw new InvalidOperationException("This book is not currently borrowed.");
+            }
+
+            book.BorrowerId = null;
+            book.Borrower = null;
+
+            await _context.SaveChangesAsync();
+
+            return book;
+        }
+
         public async Task DeleteBookAsync(int id)
         {
             var book = await _context.Books.FindAsync(id);

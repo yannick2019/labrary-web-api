@@ -10,5 +10,6 @@ namespace Library.API.Services.Interfaces
         Task UpdateBookAsync(Book book);
         Task DeleteBookAsync(int id);
         Task<Book> BorrowBookAsync(int bookId, int userId);
+        Task<Book> ReturnBookAsync(int bookId);
     }
 }

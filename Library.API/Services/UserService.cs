@@ -37,6 +37,33 @@ namespace Library.API.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<PaginatedList<User>> GetPaginatedUsersAsync(UserParameters userParameters)
+        {
+            IQueryable<User> users = _context.Users;
+
+            // Appliquer le tri
+            switch (userParameters.SortBy.ToLower())
+            {
+                case "email":
+                    users = userParameters.SortDescending
+                        ? users.OrderByDescending(u => u.Email)
+                        : users.OrderBy(u => u.Email);
+                    break;
+                default: // Par défaut, trier par nom d'utilisateur
+                    users = userParameters.SortDescending
+                        ? users.OrderByDescending(u => u.Username)
+                        : users.OrderBy(u => u.Username);
+                    break;
+            }
+
+            var count = await users.CountAsync();
+            var items = await users.Skip((userParameters.PageNumber - 1) * userParameters.PageSize)
+                                   .Take(userParameters.PageSize)
+                                   .ToListAsync();
+
+            return new PaginatedList<User>(items, count, userParameters.PageNumber, userParameters.PageSize);
+        }
+
         public async Task DeleteUserAsync(int id)
         {
             var user = await _context.Users.FindAsync(id);

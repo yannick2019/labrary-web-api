@@ -28,6 +28,18 @@ namespace Library.API.Controllers
         }
 
         /// <summary>
+        /// Gets a paginated list of users based on the provided parameters.
+        /// </summary>
+        /// <param name="userParameters">The parameters for pagination and filtering of users.</param>
+        /// <returns>A paginated list of users.</returns>
+        [HttpGet("paginated-list")]
+        public async Task<ActionResult<PaginatedList<User>>> GetUsers([FromQuery] UserParameters userParameters)
+        {
+            var users = await _userService.GetPaginatedUsersAsync(userParameters);
+            return Ok(users);
+        }
+
+        /// <summary>
         /// Gets a specific user by ID.
         /// </summary>
         /// <param name="id">The ID of the user.</param>

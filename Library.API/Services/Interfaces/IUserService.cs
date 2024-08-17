@@ -9,5 +9,6 @@ namespace Library.API.Services.Interfaces
         Task<User> AddUserAsync(User user);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(int id);
+        Task<PaginatedList<User>> GetPaginatedUsersAsync(UserParameters userParameters);
     }
 }

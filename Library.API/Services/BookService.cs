@@ -102,6 +102,38 @@ namespace Library.API.Services
             return book;
         }
 
+        public async Task<PaginatedList<Book>> GetPaginatedBooksAsync(BookParameters bookParameters)
+        {
+            IQueryable<Book> books = _context.Books;
+
+            // Appliquer le tri
+            switch (bookParameters.SortBy.ToLower())
+            {
+                case "author":
+                    books = bookParameters.SortDescending
+                        ? books.OrderByDescending(b => b.Author)
+                        : books.OrderBy(b => b.Author);
+                    break;
+                case "publicationyear":
+                    books = bookParameters.SortDescending
+                        ? books.OrderByDescending(b => b.PublicationYear)
+                        : books.OrderBy(b => b.PublicationYear);
+                    break;
+                default: // Par défaut, trier par titre
+                    books = bookParameters.SortDescending
+                        ? books.OrderByDescending(b => b.Title)
+                        : books.OrderBy(b => b.Title);
+                    break;
+            }
+
+            var count = await books.CountAsync();
+            var items = await books.Skip((bookParameters.PageNumber - 1) * bookParameters.PageSize)
+                                   .Take(bookParameters.PageSize)
+                                   .ToListAsync();
+
+            return new PaginatedList<Book>(items, count, bookParameters.PageNumber, bookParameters.PageSize);
+        }
+
         public async Task DeleteBookAsync(int id)
         {
             var book = await _context.Books.FindAsync(id);

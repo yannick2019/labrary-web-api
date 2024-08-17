@@ -30,6 +30,18 @@ namespace Library.API.Controllers
         }
 
         /// <summary>
+        /// Gets a paginated list of books based on the provided parameters.
+        /// </summary>
+        /// <param name="bookParameters">The parameters for pagination and filtering of books.</param>
+        /// <returns>A paginated list of books.</returns>
+        [HttpGet("paginated-list")]
+        public async Task<ActionResult<PaginatedList<Book>>> GetBooks([FromQuery] BookParameters bookParameters)
+        {
+            var books = await _bookService.GetPaginatedBooksAsync(bookParameters);
+            return Ok(books);
+        }
+
+        /// <summary>
         /// Gets a specific book by ID.
         /// </summary>
         /// <param name="id">The ID of the book.</param>

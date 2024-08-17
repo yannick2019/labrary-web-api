@@ -104,6 +104,45 @@ namespace Library.API.Controllers
         }
 
         /// <summary>
+        /// Borrows a book by ID.
+        /// </summary>
+        /// <param name="id">The ID of the book to borrow.</param>
+        /// <param name="userId">The ID of the user who borrow the book.</param>
+        /// <returns>No content if the borrowing was successful.</returns>
+        [HttpPost("{id}/borrow")]
+        public async Task<ActionResult<Book>> BorrowBook(int id, [FromBody] int userId)
+        {
+            try
+            {
+                var book = await _bookService.BorrowBookAsync(id, userId);
+                if (book.BorrowerId.HasValue && book.Borrower != null)
+                {
+                    var response = new BookBorrowResponse
+                    {
+                        BookId = book.Id,
+                        Title = book.Title,
+                        Author = book.Author,
+                        BorrowerId = book.BorrowerId.Value,
+                        BorrowerUsername = book.Borrower.Username
+                    };
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest("Borrower information is missing.");
+                }
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Deletes a specific book.
         /// </summary>
         /// <param name="id"></param>
@@ -114,7 +153,6 @@ namespace Library.API.Controllers
             await _bookService.DeleteBookAsync(id);
             return NoContent();
         }
-
 
         private async Task<bool> BookExists(int id)
         {

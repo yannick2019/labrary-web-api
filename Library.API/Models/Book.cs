@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Library.API.Models
 {
@@ -24,6 +25,8 @@ namespace Library.API.Models
         public int PublicationYear { get; set; }
 
         public int? BorrowerId { get; set; }
+
+        [JsonIgnore]
         public User? Borrower { get; set; }
     }
 }

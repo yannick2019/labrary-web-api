@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Library.API.Models
 {
@@ -14,6 +15,7 @@ namespace Library.API.Models
         [EmailAddress(ErrorMessage = "Invalid email format")]
         public string Email { get; set; } = string.Empty;
 
+        [JsonIgnore]
         public List<Book> BorrowedBooks { get; set; } = new List<Book>();
     }
 }

@@ -1,3 +1,4 @@
+using Library.API.Extensions;
 using Library.API.Models;
 using Library.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -32,10 +33,11 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="userParameters">The parameters for pagination and filtering of users.</param>
         /// <returns>A paginated list of users.</returns>
-        [HttpGet("paginated-list")]
+        [HttpGet(Name = "GetUsers")]
         public async Task<ActionResult<PaginatedList<User>>> GetUsers([FromQuery] UserParameters userParameters)
         {
             var users = await _userService.GetPaginatedUsersAsync(userParameters);
+            users.CreatePaginationLinks(Url, "GetUsers", userParameters);
             return Ok(users);
         }
 

@@ -7,6 +7,7 @@ namespace Library.API.Models
         public int PageIndex { get; }
         public int TotalPages { get; }
         public int TotalCount { get; }
+        public List<LinkDto> Links { get; set; } = new List<LinkDto>();
 
         public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)
         {

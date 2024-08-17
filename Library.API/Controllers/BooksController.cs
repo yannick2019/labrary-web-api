@@ -1,4 +1,5 @@
 using FluentValidation;
+using Library.API.Extensions;
 using Library.API.Models;
 using Library.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -34,10 +35,11 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="bookParameters">The parameters for pagination and filtering of books.</param>
         /// <returns>A paginated list of books.</returns>
-        [HttpGet("paginated-list")]
+        [HttpGet(Name = "GetBooks")]
         public async Task<ActionResult<PaginatedList<Book>>> GetBooks([FromQuery] BookParameters bookParameters)
         {
             var books = await _bookService.GetPaginatedBooksAsync(bookParameters);
+            books.CreatePaginationLinks(Url, "GetBooks", bookParameters);
             return Ok(books);
         }
 

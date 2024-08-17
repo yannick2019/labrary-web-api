@@ -1,7 +1,10 @@
 using System.Reflection;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Library.API.Data;
 using Library.API.Services;
 using Library.API.Services.Interfaces;
+using Library.API.Validators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -10,10 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<LibraryContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+// Configuration de FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<BookValidator>();
 
 builder.Services.AddScoped<IBookService, BookService>();
 
@@ -29,7 +38,6 @@ builder.Services.AddSwaggerGen(options =>
         Description = "An ASP.NET Core Web API for managing Library books",
     });
 
-    // using System.Reflection;
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });

@@ -1,3 +1,4 @@
+using FluentValidation;
 using Library.API.Data;
 using Library.API.Models;
 using Library.API.Services.Interfaces;
@@ -8,10 +9,12 @@ namespace Library.API.Services
     public class BookService : IBookService
     {
         private readonly LibraryContext _context;
+        private readonly IValidator<Book> _validator;
 
-        public BookService(LibraryContext context)
+        public BookService(LibraryContext context, IValidator<Book> validator)
         {
             _context = context;
+            _validator = validator;
         }
 
         public async Task<IEnumerable<Book>> GetAllBooksAsync()
@@ -26,6 +29,12 @@ namespace Library.API.Services
 
         public async Task<Book> AddBookAsync(Book book)
         {
+            var validationResult = await _validator.ValidateAsync(book);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             return book;
@@ -33,6 +42,12 @@ namespace Library.API.Services
 
         public async Task UpdateBookAsync(Book book)
         {
+            var validationResult = await _validator.ValidateAsync(book);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             _context.Entry(book).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }

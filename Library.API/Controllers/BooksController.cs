@@ -1,6 +1,8 @@
+using FluentValidation;
 using Library.API.Models;
 using Library.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Library.API.Controllers
 {
@@ -51,8 +53,16 @@ namespace Library.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
-            var createdBook = await _bookService.AddBookAsync(book);
-            return CreatedAtAction(nameof(GetBook), new { id = createdBook.Id }, createdBook);
+            try
+            {
+                var createdBook = await _bookService.AddBookAsync(book);
+                return CreatedAtAction(nameof(GetBook), new { id = createdBook.Id }, createdBook);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Errors);
+            }
+
         }
 
         /// <summary>
@@ -66,10 +76,30 @@ namespace Library.API.Controllers
         {
             if (id != book.Id)
             {
-                return BadRequest();
+                return BadRequest("The book ID does not match the route ID.");
             }
-            await _bookService.UpdateBookAsync(book);
-            return NoContent();
+
+            try
+            {
+                await _bookService.UpdateBookAsync(book);
+                return NoContent();
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Errors);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await BookExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
         }
 
         /// <summary>
@@ -82,6 +112,12 @@ namespace Library.API.Controllers
         {
             await _bookService.DeleteBookAsync(id);
             return NoContent();
+        }
+
+
+        private async Task<bool> BookExists(int id)
+        {
+            return await _bookService.GetBookByIdAsync(id) != null;
         }
     }
 }

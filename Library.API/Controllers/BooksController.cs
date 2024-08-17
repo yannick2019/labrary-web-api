@@ -40,7 +40,8 @@ namespace Library.API.Controllers
             var book = await _bookService.GetBookByIdAsync(id);
             if (book == null)
             {
-                return NotFound($"Book with ID: {id} Not found");
+                throw new KeyNotFoundException($"Book with ID {id} not found.");
+                //return NotFound($"Book with ID {id} Not found");
             }
             return Ok(book);
         }

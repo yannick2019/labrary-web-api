@@ -1,3 +1,4 @@
+using System.Reflection;
 using Library.API.Data;
 using Library.API.Services;
 using Library.API.Services.Interfaces;
@@ -27,6 +28,10 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Library API",
         Description = "An ASP.NET Core Web API for managing Library books",
     });
+
+    // using System.Reflection;
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
 var app = builder.Build();

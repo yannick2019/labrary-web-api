@@ -6,6 +6,7 @@ namespace Library.API.Controllers
 {
     [ApiController]
     [Route("api/books")]
+    [Produces("application/json")]
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
@@ -15,7 +16,10 @@ namespace Library.API.Controllers
             _bookService = bookService;
         }
 
-        // GET: api/books
+        /// <summary>
+        /// Gets all books.
+        /// </summary>
+        /// <returns>A list of all books.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
@@ -23,7 +27,11 @@ namespace Library.API.Controllers
             return Ok(books);
         }
 
-        // GET: api/books/id
+        /// <summary>
+        /// Gets a specific book by ID.
+        /// </summary>
+        /// <param name="id">The ID of the book.</param>
+        /// <returns>The book with the specified ID.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
@@ -35,7 +43,11 @@ namespace Library.API.Controllers
             return Ok(book);
         }
 
-        // POST: api/books
+        /// <summary>
+        /// Creates a new book.
+        /// </summary>
+        /// <param name="book">The book to create.</param>
+        /// <returns>The created book.</returns>
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
@@ -43,7 +55,12 @@ namespace Library.API.Controllers
             return CreatedAtAction(nameof(GetBook), new { id = createdBook.Id }, createdBook);
         }
 
-        // PUT: api/books/id
+        /// <summary>
+        /// Updates an existing book.
+        /// </summary>
+        /// <param name="id">The ID of the book to update.</param>
+        /// <param name="book">The updated book.</param>
+        /// <returns>No content if the update was successful.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, Book book)
         {
@@ -55,7 +72,11 @@ namespace Library.API.Controllers
             return NoContent();
         }
 
-        // DELETE: api/books/id
+        /// <summary>
+        /// Deletes a specific book.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {

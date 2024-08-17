@@ -2,6 +2,7 @@ using Library.API.Data;
 using Library.API.Services;
 using Library.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +15,19 @@ builder.Services.AddDbContext<LibraryContext>(options =>
 });
 
 builder.Services.AddScoped<IBookService, BookService>();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Library API",
+        Description = "An ASP.NET Core Web API for managing Library books",
+    });
+});
 
 var app = builder.Build();
 

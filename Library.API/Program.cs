@@ -27,7 +27,8 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddDbContext<LibraryContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptions => sqlServerOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
 });
 
 builder.Services.AddIdentity<User, IdentityRole>()

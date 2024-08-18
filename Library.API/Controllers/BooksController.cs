@@ -47,6 +47,18 @@ namespace Library.API.Controllers
         }
 
         /// <summary>
+        /// Searches for books based on the provided search parameters.
+        /// </summary>
+        /// <param name="parameters">The parameters for searching and filtering books.</param>
+        /// <returns>A paginated list of books that match the search criteria.</returns>
+        [HttpGet("search")]
+        public async Task<ActionResult<PaginatedList<Book>>> SearchBooks([FromQuery] BookSearchParameters parameters)
+        {
+            var books = await _bookService.SearchBooksAsync(parameters);
+            return Ok(books);
+        }
+
+        /// <summary>
         /// Gets a specific book by ID.
         /// </summary>
         /// <param name="id">The ID of the book.</param>

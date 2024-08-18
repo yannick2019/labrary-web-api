@@ -134,6 +134,38 @@ namespace Library.API.Services
             return new PaginatedList<Book>(items, count, bookParameters.PageNumber, bookParameters.PageSize);
         }
 
+        public async Task<PaginatedList<Book>> SearchBooksAsync(BookSearchParameters parameters)
+        {
+            var query = _context.Books.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(parameters.Title))
+            {
+                query = query.Where(b => EF.Functions.Like(b.Title, $"%{parameters.Title}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(parameters.Author))
+            {
+                query = query.Where(b => EF.Functions.Like(b.Author, $"%{parameters.Author}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(parameters.ISBN))
+            {
+                query = query.Where(b => EF.Functions.Like(b.ISBN, parameters.ISBN));
+            }
+
+            if (parameters.PublicationYear.HasValue)
+            {
+                query = query.Where(b => b.PublicationYear == parameters.PublicationYear.Value);
+            }
+
+            var count = await query.CountAsync();
+            var items = await query.Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                                   .Take(parameters.PageSize)
+                                   .ToListAsync();
+
+            return new PaginatedList<Book>(items, count, parameters.PageNumber, parameters.PageSize);
+        }
+
         public async Task DeleteBookAsync(int id)
         {
             var book = await _context.Books.FindAsync(id);

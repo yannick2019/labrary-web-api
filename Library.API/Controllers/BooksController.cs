@@ -52,7 +52,7 @@ namespace Library.API.Controllers
         /// <param name="parameters">The parameters for searching and filtering books.</param>
         /// <returns>A paginated list of books that match the search criteria.</returns>
         [HttpGet("search")]
-        public async Task<ActionResult<PaginatedList<Book>>> SearchBooks([FromQuery] BookSearchParameters parameters)
+        public async Task<ActionResult<PaginatedList<BookDto>>> SearchBooks([FromQuery] BookSearchParameters parameters)
         {
             var books = await _bookService.SearchBooksAsync(parameters);
             return Ok(books);
@@ -202,6 +202,48 @@ namespace Library.API.Controllers
             catch (InvalidOperationException ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Adds a genre to a book.
+        /// </summary>
+        /// <param name="bookId">The ID of the book to which the genre will be added.</param>
+        /// <param name="genreId">The ID of the genre to add to the book.</param>
+        /// <returns>No content if the genre is successfully added to the book, or NotFound if the book or genre does not exist.</returns>
+        [HttpPost("{bookId}/genres/{genreId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddGenreToBook(int bookId, int genreId)
+        {
+            try
+            {
+                await _bookService.AddGenreToBookAsync(bookId, genreId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        /// <summary>
+        /// Removes a genre from a book.
+        /// </summary>
+        /// <param name="bookId">The ID of the book from which the genre will be removed.</param>
+        /// <param name="genreId">The ID of the genre to remove from the book.</param>
+        /// <returns>No content if the genre is successfully removed from the book, or NotFound if the book or genre does not exist.</returns>
+        [HttpDelete("{bookId}/genres/{genreId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveGenreFromBook(int bookId, int genreId)
+        {
+            try
+            {
+                await _bookService.RemoveGenreFromBookAsync(bookId, genreId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
             }
         }
 

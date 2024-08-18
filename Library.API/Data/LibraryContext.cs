@@ -13,6 +13,7 @@ namespace Library.API.Data
         }
 
         public DbSet<Book> Books { get; set; }
+        public DbSet<Genre> Genres { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +28,11 @@ namespace Library.API.Data
             modelBuilder.Entity<Book>()
                 .Property(b => b.BorrowerId)
                 .IsRequired(false);
+
+            modelBuilder.Entity<Book>()
+                .HasMany(b => b.Genres)
+                .WithMany(g => g.Books)
+                .UsingEntity(j => j.ToTable("BookGenres"));
 
             // Configuration des clés primaires pour les entités Identity
             modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });

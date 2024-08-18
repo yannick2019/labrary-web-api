@@ -62,6 +62,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<BookValidator>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
 
 builder.Services.AddEndpointsApiExplorer();
 

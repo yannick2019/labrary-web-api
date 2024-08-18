@@ -12,6 +12,8 @@ namespace Library.API.Services.Interfaces
         Task<Book> BorrowBookAsync(int bookId, string userId);
         Task<Book> ReturnBookAsync(int bookId);
         Task<PaginatedList<Book>> GetPaginatedBooksAsync(BookParameters bookParameters);
-        Task<PaginatedList<Book>> SearchBooksAsync(BookSearchParameters parameters);
+        Task<PaginatedList<BookDto>> SearchBooksAsync(BookSearchParameters parameters);
+        Task AddGenreToBookAsync(int bookId, int genreId);
+        Task RemoveGenreFromBookAsync(int bookId, int genreId);
     }
 }

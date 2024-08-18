@@ -119,7 +119,7 @@ namespace Library.API.Services
                         ? books.OrderByDescending(b => b.PublicationYear)
                         : books.OrderBy(b => b.PublicationYear);
                     break;
-                default: // Par défaut, trier par titre
+                default:
                     books = bookParameters.SortDescending
                         ? books.OrderByDescending(b => b.Title)
                         : books.OrderBy(b => b.Title);
@@ -134,7 +134,7 @@ namespace Library.API.Services
             return new PaginatedList<Book>(items, count, bookParameters.PageNumber, bookParameters.PageSize);
         }
 
-        public async Task<PaginatedList<Book>> SearchBooksAsync(BookSearchParameters parameters)
+        public async Task<PaginatedList<BookDto>> SearchBooksAsync(BookSearchParameters parameters)
         {
             var query = _context.Books.AsQueryable();
 
@@ -158,12 +158,52 @@ namespace Library.API.Services
                 query = query.Where(b => b.PublicationYear == parameters.PublicationYear.Value);
             }
 
+            if (parameters.GenreId.HasValue)
+            {
+                query = query.Where(b => b.Genres.Any(g => g.Id == parameters.GenreId.Value));
+            }
+
+            if (!string.IsNullOrWhiteSpace(parameters.GenreName))
+            {
+                query = query.Where(b => b.Genres.Any(g => EF.Functions.Like(g.Name, $"%{parameters.GenreName}%")));
+            }
+
             var count = await query.CountAsync();
             var items = await query.Skip((parameters.PageNumber - 1) * parameters.PageSize)
                                    .Take(parameters.PageSize)
                                    .ToListAsync();
 
-            return new PaginatedList<Book>(items, count, parameters.PageNumber, parameters.PageSize);
+            var bookDtos = items.Select(MapToDto).ToList();
+
+            return new PaginatedList<BookDto>(bookDtos, count, parameters.PageNumber, parameters.PageSize);
+        }
+
+        public async Task AddGenreToBookAsync(int bookId, int genreId)
+        {
+            var book = await _context.Books.FindAsync(bookId);
+            var genre = await _context.Genres.FindAsync(genreId);
+
+            if (book == null || genre == null)
+            {
+                throw new KeyNotFoundException("Book or Genre not found");
+            }
+
+            book.Genres.Add(genre);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveGenreFromBookAsync(int bookId, int genreId)
+        {
+            var book = await _context.Books.Include(b => b.Genres).FirstOrDefaultAsync(b => b.Id == bookId);
+            var genre = await _context.Genres.FindAsync(genreId);
+
+            if (book == null || genre == null)
+            {
+                throw new KeyNotFoundException("Book or Genre not found");
+            }
+
+            book.Genres.Remove(genre);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteBookAsync(int id)
@@ -174,6 +214,20 @@ namespace Library.API.Services
                 _context.Books.Remove(book);
                 await _context.SaveChangesAsync();
             }
+        }
+
+
+        private BookDto MapToDto(Book book)
+        {
+            return new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                ISBN = book.ISBN,
+                PublicationYear = book.PublicationYear,
+                Genres = book.Genres.Select(g => g.Name).ToList()
+            };
         }
     }
 }

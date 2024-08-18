@@ -8,5 +8,8 @@ namespace Library.API.Models
         public int? PublicationYear { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+
+        public int? GenreId { get; set; }
+        public string GenreName { get; set; } = string.Empty;
     }
 }

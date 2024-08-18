@@ -28,5 +28,6 @@ namespace Library.API.Models
 
         [JsonIgnore]
         public User? Borrower { get; set; }
+        public List<Genre> Genres { get; set; } = new List<Genre>();
     }
 }

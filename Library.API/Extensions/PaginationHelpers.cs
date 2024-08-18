@@ -25,7 +25,7 @@ namespace Library.API.Extensions
         {
             var values = new RouteValueDictionary(routeValues) { ["PageNumber"] = pageNumber };
             var href = urlHelper.Link(routeName, values);
-            return new LinkDto(href, rel, method);
+            return new LinkDto(href!, rel, method);
         }
     }
 }

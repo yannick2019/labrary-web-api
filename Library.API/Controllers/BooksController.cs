@@ -2,6 +2,7 @@ using FluentValidation;
 using Library.API.Extensions;
 using Library.API.Models;
 using Library.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,7 @@ namespace Library.API.Controllers
         /// </summary>
         /// <returns>A list of all books.</returns>
         [HttpGet(Name = "GetAllBooks")]
+        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks()
         {
             var books = await _bookService.GetAllBooksAsync();
@@ -36,6 +38,7 @@ namespace Library.API.Controllers
         /// <param name="bookParameters">The parameters for pagination and filtering of books.</param>
         /// <returns>A paginated list of books.</returns>
         [HttpGet("paginated-list", Name = "GetBooks")]
+        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<PaginatedList<Book>>> GetBooks([FromQuery] BookParameters bookParameters)
         {
             var books = await _bookService.GetPaginatedBooksAsync(bookParameters);
@@ -49,6 +52,7 @@ namespace Library.API.Controllers
         /// <param name="id">The ID of the book.</param>
         /// <returns>The book with the specified ID.</returns>
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
             var book = await _bookService.GetBookByIdAsync(id);
@@ -66,6 +70,7 @@ namespace Library.API.Controllers
         /// <param name="book">The book to create.</param>
         /// <returns>The created book.</returns>
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
             try
@@ -87,6 +92,7 @@ namespace Library.API.Controllers
         /// <param name="book">The updated book.</param>
         /// <returns>No content if the update was successful.</returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateBook(int id, Book book)
         {
             if (id != book.Id)
@@ -124,20 +130,21 @@ namespace Library.API.Controllers
         /// <param name="userId">The ID of the user who borrow the book.</param>
         /// <returns>No content if the borrowing was successful.</returns>
         [HttpPost("{id}/borrow")]
-        public async Task<ActionResult<Book>> BorrowBook(int id, [FromBody] int userId)
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult<Book>> BorrowBook(int id, [FromBody] string userId)
         {
             try
             {
                 var book = await _bookService.BorrowBookAsync(id, userId);
-                if (book.BorrowerId.HasValue && book.Borrower != null)
+                if (!string.IsNullOrEmpty(book.BorrowerId) && book.Borrower != null)
                 {
                     var response = new BookBorrowResponse
                     {
                         BookId = book.Id,
                         Title = book.Title,
                         Author = book.Author,
-                        BorrowerId = book.BorrowerId.Value,
-                        BorrowerUsername = book.Borrower.Username
+                        BorrowerId = book.BorrowerId,
+                        BorrowerUsername = book.Borrower.UserName!
                     };
                     return Ok(response);
                 }
@@ -162,6 +169,7 @@ namespace Library.API.Controllers
         /// <param name="id">The ID of the book to return.</param>
         /// <returns>BookReturnResponse if the return was successful.</returns>
         [HttpPost("{id}/return")]
+        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<BookReturnResponse>> ReturnBook(int id)
         {
             try
@@ -191,6 +199,7 @@ namespace Library.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBook(int id)
         {
             await _bookService.DeleteBookAsync(id);

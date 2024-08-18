@@ -52,7 +52,7 @@ namespace Library.API.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Book> BorrowBookAsync(int bookId, int userId)
+        public async Task<Book> BorrowBookAsync(int bookId, string userId)
         {
             var book = await _context.Books.FindAsync(bookId);
             if (book == null)
@@ -61,7 +61,7 @@ namespace Library.API.Services
                 //return NotFound("Book not found");
             }
 
-            if (book.BorrowerId.HasValue)
+            if (string.IsNullOrEmpty(book.BorrowerId))
             {
                 throw new InvalidOperationException("This book is already borrowed.");
             }
@@ -89,7 +89,7 @@ namespace Library.API.Services
                 throw new KeyNotFoundException($"Book with ID {bookId} not found.");
             }
 
-            if (!book.BorrowerId.HasValue)
+            if (string.IsNullOrEmpty(book.BorrowerId))
             {
                 throw new InvalidOperationException("This book is not currently borrowed.");
             }

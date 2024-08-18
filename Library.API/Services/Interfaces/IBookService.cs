@@ -9,7 +9,7 @@ namespace Library.API.Services.Interfaces
         Task<Book> AddBookAsync(Book book);
         Task UpdateBookAsync(Book book);
         Task DeleteBookAsync(int id);
-        Task<Book> BorrowBookAsync(int bookId, int userId);
+        Task<Book> BorrowBookAsync(int bookId, string userId);
         Task<Book> ReturnBookAsync(int bookId);
         Task<PaginatedList<Book>> GetPaginatedBooksAsync(BookParameters bookParameters);
     }

@@ -1,9 +1,11 @@
 using Library.API.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Library.API.Data
 {
-    public class LibraryContext : DbContext
+    public class LibraryContext : IdentityDbContext<User>
     {
         public LibraryContext(DbContextOptions<LibraryContext> options) : base(options)
         {
@@ -11,10 +13,11 @@ namespace Library.API.Data
         }
 
         public DbSet<Book> Books { get; set; }
-        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Book>()
                 .HasOne(b => b.Borrower)
                 .WithMany(u => u.BorrowedBooks)
@@ -24,6 +27,13 @@ namespace Library.API.Data
             modelBuilder.Entity<Book>()
                 .Property(b => b.BorrowerId)
                 .IsRequired(false);
+
+            // Configuration des clés primaires pour les entités Identity
+            modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
+
+            modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
+
+            modelBuilder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
         }
     }
 }

@@ -24,6 +24,8 @@ namespace Library.API.Models
         [Range(1000, 9999, ErrorMessage = "Year of publication must be between 1000 and 9999")]
         public int PublicationYear { get; set; }
 
+        public string? ImageUrl { get; set; }
+
         public string? BorrowerId { get; set; }
 
         [JsonIgnore]

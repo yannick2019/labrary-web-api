@@ -77,17 +77,19 @@ namespace Library.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new book.
+        /// Handles the HTTP POST request to add a new book.
         /// </summary>
-        /// <param name="book">The book to create.</param>
+        /// <param name="book">The book object to be added.</param>
+        /// <param name="image">The image file associated with the book.</param>
         /// <returns>The created book.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Book>> PostBook(Book book)
+        public async Task<ActionResult<Book>> PostBook(Book book, IFormFile image)
         {
             try
             {
-                var createdBook = await _bookService.AddBookAsync(book);
+                var createdBook = await _bookService.AddBookAsync(book, image);
                 return CreatedAtAction(nameof(GetBook), new { id = createdBook.Id }, createdBook);
             }
             catch (ValidationException ex)
@@ -102,10 +104,12 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the book to update.</param>
         /// <param name="book">The updated book.</param>
+        /// <param name="image">The image file associated with the book.</param>
         /// <returns>No content if the update was successful.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateBook(int id, Book book)
+        public async Task<IActionResult> UpdateBook(int id, Book book, IFormFile image)
         {
             if (id != book.Id)
             {
@@ -114,25 +118,13 @@ namespace Library.API.Controllers
 
             try
             {
-                await _bookService.UpdateBookAsync(book);
+                await _bookService.UpdateBookAsync(book, image);
                 return NoContent();
             }
             catch (ValidationException ex)
             {
                 return BadRequest(ex.Errors);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await BookExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
         }
 
         /// <summary>
@@ -211,6 +203,7 @@ namespace Library.API.Controllers
         /// <param name="bookId">The ID of the book to which the genre will be added.</param>
         /// <param name="genreId">The ID of the genre to add to the book.</param>
         /// <returns>No content if the genre is successfully added to the book, or NotFound if the book or genre does not exist.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpPost("{bookId}/genres/{genreId}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddGenreToBook(int bookId, int genreId)
@@ -232,6 +225,7 @@ namespace Library.API.Controllers
         /// <param name="bookId">The ID of the book from which the genre will be removed.</param>
         /// <param name="genreId">The ID of the genre to remove from the book.</param>
         /// <returns>No content if the genre is successfully removed from the book, or NotFound if the book or genre does not exist.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpDelete("{bookId}/genres/{genreId}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveGenreFromBook(int bookId, int genreId)
@@ -251,7 +245,8 @@ namespace Library.API.Controllers
         /// Deletes a specific book.
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
+        /// <returns>NoContent.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBook(int id)

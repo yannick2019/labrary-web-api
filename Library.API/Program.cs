@@ -63,6 +63,8 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
+builder.Services.AddScoped<IImageValidationService, ImageValidationService>();
 
 builder.Services.AddEndpointsApiExplorer();
 

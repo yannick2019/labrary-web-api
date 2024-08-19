@@ -22,6 +22,7 @@ namespace Library.API.Controllers
         /// Gets all users.
         /// </summary>
         /// <returns>A list of all users.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpGet(Name = "GetAllUsers")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
@@ -35,6 +36,7 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="userParameters">The parameters for pagination and filtering of users.</param>
         /// <returns>A paginated list of users.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpGet("paginated-list", Name = "GetUsers")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<PaginatedList<UserDto>>> GetUsers([FromQuery] UserParameters userParameters)
@@ -49,6 +51,7 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the user.</param>
         /// <returns>The user with the specified ID.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<User>> GetUser(string id)
@@ -68,6 +71,7 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="user">The user to create.</param>
         /// <returns>The created user.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<User>> PostUser(User user)
@@ -82,6 +86,7 @@ namespace Library.API.Controllers
         /// <param name="id">The ID of the user to update.</param>
         /// <param name="user">The updated user.</param>
         /// <returns>No content if the update was successful.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutUser(string id, User user)
@@ -100,6 +105,7 @@ namespace Library.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the user to delete.</param>
         /// <returns>No content if the deletion was successful.</returns>
+        /// <remarks>This action is restricted to users with the "Admin" role.</remarks>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(string id)

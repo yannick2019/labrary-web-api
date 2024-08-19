@@ -10,11 +10,19 @@ namespace Library.API.Services
     {
         private readonly LibraryContext _context;
         private readonly IValidator<Book> _validator;
+        private readonly IImageStorageService _imageStorageService;
+        private readonly IImageValidationService _imageValidationService;
 
-        public BookService(LibraryContext context, IValidator<Book> validator)
+        public BookService(
+            LibraryContext context,
+            IValidator<Book> validator,
+            IImageStorageService imageStorageService,
+            IImageValidationService imageValidationService)
         {
             _context = context;
             _validator = validator;
+            _imageStorageService = imageStorageService;
+            _imageValidationService = imageValidationService;
         }
 
         public async Task<IEnumerable<Book>> GetAllBooksAsync()
@@ -27,7 +35,7 @@ namespace Library.API.Services
             return await _context.Books.FindAsync(id);
         }
 
-        public async Task<Book> AddBookAsync(Book book)
+        public async Task<Book> AddBookAsync(Book book, IFormFile image)
         {
             var validationResult = await _validator.ValidateAsync(book);
             if (!validationResult.IsValid)
@@ -35,17 +43,38 @@ namespace Library.API.Services
                 throw new ValidationException(validationResult.Errors);
             }
 
+            if (image != null)
+            {
+                var imageValidationResult = _imageValidationService.ValidateImage(image);
+                if (!imageValidationResult.IsValid)
+                {
+                    throw new ArgumentException(imageValidationResult.ErrorMessage);
+                }
+                book.ImageUrl = await _imageStorageService.UploadImageAsync(image);
+            }
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             return book;
         }
 
-        public async Task UpdateBookAsync(Book book)
+        public async Task UpdateBookAsync(Book book, IFormFile image)
         {
             var validationResult = await _validator.ValidateAsync(book);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
+            }
+
+            if (image != null)
+            {
+                var imageValidationResult = _imageValidationService.ValidateImage(image);
+                if (!imageValidationResult.IsValid)
+                {
+                    throw new ArgumentException(imageValidationResult.ErrorMessage);
+                }
+                await _imageStorageService.DeleteImageAsync(book.ImageUrl!);
+                book.ImageUrl = await _imageStorageService.UploadImageAsync(image);
             }
 
             _context.Entry(book).State = EntityState.Modified;
@@ -211,6 +240,7 @@ namespace Library.API.Services
             var book = await _context.Books.FindAsync(id);
             if (book != null)
             {
+                await _imageStorageService.DeleteImageAsync(book.ImageUrl!);
                 _context.Books.Remove(book);
                 await _context.SaveChangesAsync();
             }

@@ -6,8 +6,8 @@ namespace Library.API.Services.Interfaces
     {
         Task<IEnumerable<Book>> GetAllBooksAsync();
         Task<Book?> GetBookByIdAsync(int id);
-        Task<Book> AddBookAsync(Book book);
-        Task UpdateBookAsync(Book book);
+        Task<Book> AddBookAsync(Book book, IFormFile image);
+        Task UpdateBookAsync(Book book, IFormFile image);
         Task DeleteBookAsync(int id);
         Task<Book> BorrowBookAsync(int bookId, string userId);
         Task<Book> ReturnBookAsync(int bookId);

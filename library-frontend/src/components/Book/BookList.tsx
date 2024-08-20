@@ -7,14 +7,20 @@ const BookList: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
+  const fetchBooks = async () => {
+    try {
+      const fetchedBooks = await getBooks();
+      setBooks(fetchedBooks);
+    } catch (error) {
+      console.error("Failed fetching books", error);
+    }
+  };
+
   useEffect(() => {
     fetchBooks();
   }, []);
 
-  const fetchBooks = async () => {
-    const fetchedBooks = await getBooks();
-    setBooks(fetchedBooks);
-  };
+  console.log("books", books);
 
   // const handleAddBook = async (newBook: NewBook) => {
   //   const createdBook = await createBook(newBook);

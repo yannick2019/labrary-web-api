@@ -17,11 +17,19 @@ using Microsoft.OpenApi.Models;
 
 Env.Load();
 
-var builder = WebApplication.CreateBuilder(args);
+var options = new WebApplicationOptions
+{
+    WebRootPath = "wwwroot",
+};
+
+var builder = WebApplication.CreateBuilder(options);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+// Add IWebHostEnvironment to services
+builder.Services.AddSingleton(builder.Environment);
 
 builder.Configuration.AddEnvironmentVariables();
 

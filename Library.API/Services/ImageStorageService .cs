@@ -5,11 +5,36 @@ namespace Library.API.Services
     public class ImageStorageService : IImageStorageService
     {
         private readonly string _imageDirectory;
+        private readonly ILogger<ImageStorageService> _logger;
 
-        public ImageStorageService(IWebHostEnvironment environment)
+        public ImageStorageService(IWebHostEnvironment environment, ILogger<ImageStorageService> logger)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            if (environment == null)
+            {
+                _logger.LogError("IWebHostEnvironment is null");
+                throw new ArgumentNullException(nameof(environment));
+            }
+
+            if (string.IsNullOrEmpty(environment.WebRootPath))
+            {
+                _logger.LogError("WebRootPath is null or empty");
+                throw new ArgumentNullException(nameof(environment.WebRootPath));
+            }
+
             _imageDirectory = Path.Combine(environment.WebRootPath, "images", "books");
-            Directory.CreateDirectory(_imageDirectory);
+
+            if (string.IsNullOrEmpty(_imageDirectory))
+            {
+                _logger.LogError("Image directory path is null or empty");
+                throw new ArgumentNullException(nameof(_imageDirectory));
+            }
+
+            if (!Directory.Exists(_imageDirectory))
+            {
+                Directory.CreateDirectory(_imageDirectory);
+            }
         }
 
         public async Task<string> UploadImageAsync(IFormFile file)

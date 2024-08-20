@@ -1,5 +1,5 @@
 import api from "./api";
-import { Book, NewBook } from "../types/User";
+import { Book, NewBook } from "../types/Book";
 
 export const getBooks = async (): Promise<Book[]> => {
   const response = await api.get<Book[]>("/books");

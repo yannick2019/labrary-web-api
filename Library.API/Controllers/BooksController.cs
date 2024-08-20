@@ -25,7 +25,6 @@ namespace Library.API.Controllers
         /// </summary>
         /// <returns>A list of all books.</returns>
         [HttpGet(Name = "GetAllBooks")]
-        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks()
         {
             var books = await _bookService.GetAllBooksAsync();
@@ -38,7 +37,6 @@ namespace Library.API.Controllers
         /// <param name="bookParameters">The parameters for pagination and filtering of books.</param>
         /// <returns>A paginated list of books.</returns>
         [HttpGet("paginated-list", Name = "GetBooks")]
-        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<PaginatedList<Book>>> GetBooks([FromQuery] BookParameters bookParameters)
         {
             var books = await _bookService.GetPaginatedBooksAsync(bookParameters);
@@ -64,7 +62,6 @@ namespace Library.API.Controllers
         /// <param name="id">The ID of the book.</param>
         /// <returns>The book with the specified ID.</returns>
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
             var book = await _bookService.GetBookByIdAsync(id);
@@ -134,7 +131,7 @@ namespace Library.API.Controllers
         /// <param name="userId">The ID of the user who borrow the book.</param>
         /// <returns>No content if the borrowing was successful.</returns>
         [HttpPost("{id}/borrow")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<Book>> BorrowBook(int id, [FromBody] string userId)
         {
             try
